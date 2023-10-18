@@ -18,7 +18,8 @@ Route::post('login', [Controllers\UserController::class, 'login']);
 Route::post('register', [Controllers\UserController::class, 'register']);
 
 Route::group(['middleware' => 'auth:api'], function () {
-    Route::get('details', [Controllers\UserController::class, 'details'])->name("details");
+    Route::get('user', [Controllers\UserController::class, 'details']);
+    Route::post('user', [Controllers\UserController::class, 'edit']);
 
     Route::get('tags', [Controllers\TagController::class, 'all']);
 

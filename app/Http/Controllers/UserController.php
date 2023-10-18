@@ -60,4 +60,21 @@ class UserController extends Controller
         $user = Auth::user();
         return response()->json(['success' => $user], 200);
     }
+
+    public function edit(Request $request)
+    {
+        $this->validate($request, [
+            'first_name' => 'required|',
+            'last_name' => 'required',
+        ]);
+
+        $user = User::find($request->user()->id);
+
+        $user->first_name = $request->first_name;
+        $user->last_name = $request->last_name;
+
+        $user->save();
+
+        return response()->json(['success' => $user], 200);
+    }
 }
