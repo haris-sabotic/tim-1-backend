@@ -19,4 +19,14 @@ Route::post('register', [Controllers\UserController::class, 'register']);
 
 Route::group(['middleware' => 'auth:api'], function () {
     Route::get('details', [Controllers\UserController::class, 'details'])->name("details");
+
+    Route::get('tags', [Controllers\TagController::class, 'all']);
+
+    Route::get('articles', [Controllers\ArticleController::class, 'all']);
+
+    Route::get('order', [Controllers\OrderController::class, 'getOrder']);
+    Route::post('order', [Controllers\OrderController::class, 'makeOrder']);
+
+    Route::get('ratings', [Controllers\OrderController::class, 'getRatings']);
+    Route::post('ratings', [Controllers\OrderController::class, 'postRatings']);
 });
