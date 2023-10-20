@@ -13,7 +13,6 @@ class OrderController extends Controller
     public function makeOrder(Request $request)
     {
         $this->validate($request, [
-            'expires_on' => 'required|date',
             'articles' => 'required',
             'articles.*.article_id' => 'required|exists:articles,id',
             'articles.*.count' => 'required',
@@ -25,37 +24,34 @@ class OrderController extends Controller
             return response()->json(['error' => "You can't order before $startTime."], 400);
         }
 
-        $orderId = $request->user()->order_id; // current user's order
+        $userId = $request->user()->id;
 
-        // orderId will be null if the user's ordering for the first time, so create his order here
-        if ($orderId == null) {
-            $order = Order::create([
-                'state' => 'preparing',
-                'expires_on' => $request->expires_on,
-                'comment' => $request->comment
-            ]);
+        $date = $this->getOrderDate($request);
 
-            $orderId = $order->id;
+        // if the user's already ordered for the given date, delete that order and its articles and article ratings
+        $order = $this->getUserOrder($request, $date);
+        if ($order->first() != null) {
+            $orderId = $order->first()->id;
 
-            // update user's order_id
-            $user = User::find($request->user()->id);
-            $user->order_id = $orderId;
-            $user->save();
-        } else { // otherwise, update the existing one
-            $order = Order::find($orderId);
-            $order->state = 'preparing';
-            $order->expires_on = $request->expires_on;
-            $order->comment = $request->comment;
+            $orderArticles = OrderArticle::where('order_id', $orderId)->get();
+            foreach ($orderArticles as $orderArticle) {
+                OrderArticleRating::where('order_article_id', $orderArticle->id)->delete();
+            }
+            OrderArticle::where('order_id', $orderId)->delete();
 
-            $order->save();
+            $order->delete();
         }
 
-        // delete article ratings and articles associated with the previous order
-        $orderArticles = OrderArticle::where('order_id', $orderId)->get();
-        foreach ($orderArticles as $orderArticle) {
-            OrderArticleRating::where('order_article_id', $orderArticle->id)->delete();
-        }
-        OrderArticle::where('order_id', $orderId)->delete();
+        // create order
+        $order = Order::create([
+            'user_id' => $userId,
+            'state' => 'preparing',
+            'comment' => $request->comment,
+            'date' => $date
+        ]);
+
+        $orderId = $order->id;
+
 
         // create the new order's articles
         foreach ($request->articles as $article) {
@@ -71,21 +67,25 @@ class OrderController extends Controller
 
     public function getOrder(Request $request)
     {
-        return Order::find($request->user()->id)->get()->load('articles');
+        $date = $this->getOrderDate($request);
+        return $this->getUserOrder($request, $date)->first()->load('articles');
     }
 
     public function postRatings(Request $request)
     {
         $this->validate($request, [
-            'data.*.article_id' => 'required|exists:articles,id',
-            'data.*.stars' => 'required',
+            'ratings.*.article_id' => 'required|exists:articles,id',
+            'ratings.*.stars' => 'required',
         ]);
 
+        $date = $this->getOrderDate($request);
 
-        $orderId = $request->user()->order_id;
-        if ($orderId == null) {
-            return response()->json(['error' => "User hasn't made an order yet."], 400);
+        $order = $this->getUserOrder($request, $date)->first();
+        if ($order == null) {
+            return response()->json(['error' => "User hasn't made an order for that day yet."], 400);
         }
+
+        $orderId = $order->id;
 
         // delete previous article ratings
         $orderArticles = OrderArticle::where('order_id', $orderId)->get();
@@ -94,14 +94,19 @@ class OrderController extends Controller
         }
 
         // create new article ratings
-        foreach ($request->data as $r) {
+        foreach ($request->ratings as $r) {
             $order_article = OrderArticle::where("order_id", '=', $orderId, 'and')->where('article_id', $r['article_id'])->first();
             // don't create the rating if it's for an article that doesn't exist in the current order
             if ($order_article) {
+                $comment = null;
+                if (isset($r['comment'])) {
+                    $comment = $r['comment'];
+                }
+
                 OrderArticleRating::create([
                     "order_article_id" => $order_article->id,
                     'stars' => $r['stars'],
-                    'comment' => $r['comment']
+                    'comment' => $comment
                 ]);
             }
         }
@@ -111,10 +116,14 @@ class OrderController extends Controller
 
     public function getRatings(Request $request)
     {
-        $orderId = $request->user()->order_id;
-        if ($orderId == null) {
-            return response()->json(['error' => "User hasn't made an order yet."], 400);
+        $date = $this->getOrderDate($request);
+
+        $order = $this->getUserOrder($request, $date)->first();
+        if ($order == null) {
+            return response()->json(['error' => "User hasn't made an order for that day yet."], 400);
         }
+
+        $orderId = $order->id;
 
         $result = [];
 
@@ -132,5 +141,24 @@ class OrderController extends Controller
         }
 
         return $result;
+    }
+
+    private function getOrderDate(Request $request)
+    {
+        // get date from request or use today's date as fallback
+        $date = date('Y-m-d');
+        if ($request->date) {
+            $date = $request->date;
+        }
+
+        return $date;
+    }
+
+    private function getUserOrder(Request $request, $date)
+    {
+        // if the user's already ordered for the given date, delete that order and its articles and article ratings
+        $order = Order::where('user_id', '=', $request->user()->id, 'and')->where('date', '=', $date);
+
+        return $order;
     }
 }

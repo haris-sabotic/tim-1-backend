@@ -17,9 +17,10 @@ class Order extends Model
      * @var array<int, string>
      */
     protected $fillable = [
+        'user_id',
         'state',
         'comment',
-        'expires_on',
+        'date',
     ];
 
     /**
