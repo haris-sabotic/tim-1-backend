@@ -19,7 +19,7 @@ Route::post('register', [Controllers\UserController::class, 'register']);
 
 Route::group(['middleware' => 'auth:api'], function () {
     Route::get('user', [Controllers\UserController::class, 'details']);
-    Route::put('user', [Controllers\UserController::class, 'edit']);
+    Route::post('user', [Controllers\UserController::class, 'edit']);
 
     Route::get('tags', [Controllers\TagController::class, 'all']);
 

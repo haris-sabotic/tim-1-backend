@@ -6,6 +6,7 @@ use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Str;
 
 class UserController extends Controller
 {
@@ -64,15 +65,30 @@ class UserController extends Controller
 
     public function edit(Request $request)
     {
+        /*
         $this->validate($request, [
-            'first_name' => 'required|',
+            'first_name' => 'required',
             'last_name' => 'required',
+            'photo' => 'required|image|mimes:jpeg,png,jpg,gif|max:4096',
         ]);
+        */
 
         $user = User::find($request->user()->id);
 
-        $user->first_name = $request->first_name;
-        $user->last_name = $request->last_name;
+        if ($request->file('photo')) {
+            $photoName = time() . '_' . Str::uuid() . '.' . $request->file('photo')->extension();
+            $request->file('photo')->move(public_path('photos'), $photoName);
+
+            $user->photo = $photoName;
+        }
+
+        if ($request->first_name) {
+            $user->first_name = $request->first_name;
+        }
+
+        if ($request->last_name) {
+            $user->last_name = $request->last_name;
+        }
 
         $user->save();
 
