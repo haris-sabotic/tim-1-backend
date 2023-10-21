@@ -25,8 +25,8 @@ class DatabaseSeeder extends Seeder
         ]);
 
         DB::table('tags')->insert([
-            ['name' => 'Pizza'],
-            ['name' => 'Burger'],
+            ['name' => 'Pizza'], // id 1
+            ['name' => 'Burger'], // id 2
             ['name' => 'Sweets'],
             ['name' => 'Breakfast'],
             ['name' => 'Cooked'],
@@ -37,13 +37,13 @@ class DatabaseSeeder extends Seeder
         ]);
 
         DB::table('articles')->insert([
-            [
+            [ // id 1
                 'name' => 'Pizza Capricciosa',
                 'description' => 'Indulge in the classic perfection of Pizza Capricciosa—melted mozzarella, savory ham, mushrooms, and zesty tomato sauce. An Italian delight in every bite!',
                 'ingredients' => 'Mozzarela cheese, baked ham, mushrooms, tomato',
                 'price' => 5.50
             ],
-            [
+            [ // id 2
                 'name' => 'American hamburger',
                 'description' => null,
                 'ingredients' => 'Ham pattie, grilled onions, salad, tomato, american chesse',
