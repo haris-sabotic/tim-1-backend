@@ -28,18 +28,9 @@ class OrderController extends Controller
 
         $date = $this->getOrderDate($request);
 
-        // if the user's already ordered for the given date, delete that order and its articles and article ratings
-        $order = $this->getUserOrder($request, $date);
-        if ($order->first() != null) {
-            $orderId = $order->first()->id;
-
-            $orderArticles = OrderArticle::where('order_id', $orderId)->get();
-            foreach ($orderArticles as $orderArticle) {
-                OrderArticleRating::where('order_article_id', $orderArticle->id)->delete();
-            }
-            OrderArticle::where('order_id', $orderId)->delete();
-
-            $order->delete();
+        // early return if the user's already ordered for the given date
+        if ($this->getUserOrder($request, $date)->first() != null) {
+            return response()->json(['error' => "You've already ordered for that day."], 400);
         }
 
         // create order
