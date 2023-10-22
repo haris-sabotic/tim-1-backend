@@ -78,13 +78,21 @@ class OrderController extends Controller
 
     public function getOrder(Request $request)
     {
+
         $date = $this->getOrderDate($request);
-        return $this->getUserOrder($request, $date)->first()->load('articles');
+
+        $order = $this->getUserOrder($request, $date)->first();
+        if ($order == null) {
+            return response()->json(['error' => "User hasn't made an order for that day yet."], 400);
+        }
+
+        return $order->load('articles');
     }
 
     public function postRatings(Request $request)
     {
         $this->validate($request, [
+            'ratings' => 'required',
             'ratings.*.article_id' => 'required|exists:articles,id',
             'ratings.*.stars' => 'required',
         ]);
