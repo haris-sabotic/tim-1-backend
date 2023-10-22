@@ -10,6 +10,19 @@ class Article extends Model
 {
     use HasFactory;
 
+    /**
+     * The attributes that are mass assignable.
+     *
+     * @var array<int, string>
+     */
+    protected $fillable = [
+        'name',
+        'price',
+        'description',
+        'ingredients',
+        'photo',
+    ];
+
 
     /**
      * The tags that belong to the Article

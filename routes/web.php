@@ -17,3 +17,8 @@ Auth::routes();
 
 Route::get('/', [App\Http\Controllers\HomeController::class, 'index'])->name('home');
 Route::get('/home', [App\Http\Controllers\HomeController::class, 'index'])->name('home');
+
+Route::get('/admin/menu', [App\Http\Controllers\AdminMenuController::class, 'index'])->name('menu');
+Route::post('/admin/menu/create', [App\Http\Controllers\AdminMenuController::class, 'create'])->name('menu.create');
+Route::post('/admin/menu/edit', [App\Http\Controllers\AdminMenuController::class, 'edit'])->name('menu.edit');
+Route::post('/admin/menu/delete', [App\Http\Controllers\AdminMenuController::class, 'delete'])->name('menu.delete');
