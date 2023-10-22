@@ -104,7 +104,7 @@ class AdminUserController extends Controller
     {
         $id = $request->id;
         $user = User::find($request->id);
-        $name = $user->name;
+        $name = $user->first_name . " " . $user->last_name;
         $user->delete();
 
         $request->session()->flash('message', "Successfully deleted \"" . $name . "\"");
