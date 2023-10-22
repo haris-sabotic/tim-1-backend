@@ -22,3 +22,8 @@ Route::get('/admin/menu', [App\Http\Controllers\AdminMenuController::class, 'ind
 Route::post('/admin/menu/create', [App\Http\Controllers\AdminMenuController::class, 'create'])->name('menu.create');
 Route::post('/admin/menu/edit', [App\Http\Controllers\AdminMenuController::class, 'edit'])->name('menu.edit');
 Route::post('/admin/menu/delete', [App\Http\Controllers\AdminMenuController::class, 'delete'])->name('menu.delete');
+
+Route::get('/admin/users', [App\Http\Controllers\AdminUserController::class, 'index'])->name('users');
+Route::post('/admin/users/create', [App\Http\Controllers\AdminUserController::class, 'create'])->name('user.create');
+Route::post('/admin/users/edit', [App\Http\Controllers\AdminUserController::class, 'edit'])->name('user.edit');
+Route::post('/admin/users/delete', [App\Http\Controllers\AdminUserController::class, 'delete'])->name('user.delete');
