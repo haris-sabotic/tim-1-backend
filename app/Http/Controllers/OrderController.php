@@ -18,9 +18,11 @@ class OrderController extends Controller
             'articles.*.count' => 'required',
         ]);
 
-        // early return if trying to order before the set start time
-        $startTime = env("ORDER_START_TIME");
-        if (time() <= strtotime($startTime)) {
+        // early return if trying to order before the set start time or after the set end time
+        $startTime = strtotime(env("ORDER_START_TIME"));
+        $endTime = strtotime(env("ORDER_END_TIME"));
+        $t = time();
+        if ($t < $startTime || $t > $endTime) {
             return response()->json(['error' => "You can't order before $startTime."], 400);
         }
 
