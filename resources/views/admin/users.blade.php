@@ -96,6 +96,10 @@
             <input type="email" name="email" id="modalCreateEmail">
             <div class="error-message" id="modalCreateErrorEmail"></div>
 
+            <label for="modalCreatePassword">Password</label>
+            <input type="password" name="password" id="modalCreatePassword">
+            <div class="error-message" id="modalCreateErrorPassword"></div>
+
             <label for="modalCreate">Photo</label>
             <input type="file" name="photo" id="modalCreatePhoto">
             <div class="error-message" id="modalCreateErrorPhoto"></div>
@@ -250,6 +254,7 @@
             let firstName = $("#modalCreateFirstName").val();
             let lastName = $("#modalCreateLastName").val();
             let email = $("#modalCreateEmail").val();
+            let password = $("#modalCreatePassword").val();
             let photo = $("#modalCreatePhoto").prop('files')[0];
 
             let passed = true;
@@ -273,6 +278,13 @@
                 passed = false;
             } else {
                 $("#modalCreateErrorEmail").text("")
+            }
+
+            if (!password) {
+                $("#modalCreateErrorPassword").text("This field is required.")
+                passed = false;
+            } else {
+                $("#modalCreateErrorPassword").text("")
             }
 
 

@@ -27,3 +27,6 @@ Route::get('/admin/users', [App\Http\Controllers\AdminUserController::class, 'in
 Route::post('/admin/users/create', [App\Http\Controllers\AdminUserController::class, 'create'])->name('user.create');
 Route::post('/admin/users/edit', [App\Http\Controllers\AdminUserController::class, 'edit'])->name('user.edit');
 Route::post('/admin/users/delete', [App\Http\Controllers\AdminUserController::class, 'delete'])->name('user.delete');
+
+Route::get('/admin/orders', [App\Http\Controllers\AdminOrderController::class, 'index'])->name('orders');
+Route::post('/admin/orders/edit', [App\Http\Controllers\AdminOrderController::class, 'edit'])->name('order.edit');
