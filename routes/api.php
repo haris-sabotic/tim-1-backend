@@ -26,6 +26,7 @@ Route::group(['middleware' => 'auth:api'], function () {
     Route::get('articles', [Controllers\ArticleController::class, 'all']);
     Route::get('articles/{id}', [Controllers\ArticleController::class, 'single']);
 
+    Route::get('order-possible', [Controllers\OrderController::class, 'isOrderPossible']);
     Route::get('order', [Controllers\OrderController::class, 'getOrder']);
     Route::post('order', [Controllers\OrderController::class, 'makeOrder']);
 

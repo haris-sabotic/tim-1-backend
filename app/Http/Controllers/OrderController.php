@@ -10,6 +10,24 @@ use Illuminate\Http\Request;
 
 class OrderController extends Controller
 {
+    public function isOrderPossible(Request $request)
+    {
+        $startTime = env("ORDER_START_TIME");
+        $endTime = env("ORDER_END_TIME");
+        $t = time();
+        if ($t < strtotime($startTime) || $t > strtotime($endTime)) {
+            return response()->json(['error' => "You can't order before $startTime or after $endTime."], 400);
+        }
+
+
+        $date = $this->getOrderDate($request);
+        if ($this->getUserOrder($request, $date)->first() != null) {
+            return response()->json(['error' => "You've already ordered for that day."], 400);
+        }
+
+        return response()->json(['success' => "You are allowed to make an order."], 200);
+    }
+
     public function makeOrder(Request $request)
     {
         $this->validate($request, [
@@ -19,11 +37,11 @@ class OrderController extends Controller
         ]);
 
         // early return if trying to order before the set start time or after the set end time
-        $startTime = strtotime(env("ORDER_START_TIME"));
-        $endTime = strtotime(env("ORDER_END_TIME"));
+        $startTime = env("ORDER_START_TIME");
+        $endTime = env("ORDER_END_TIME");
         $t = time();
-        if ($t < $startTime || $t > $endTime) {
-            return response()->json(['error' => "You can't order before $startTime."], 400);
+        if ($t < strtotime($startTime) || $t > strtotime($endTime)) {
+            return response()->json(['error' => "You can't order before $startTime or after $endTime."], 400);
         }
 
         $userId = $request->user()->id;
